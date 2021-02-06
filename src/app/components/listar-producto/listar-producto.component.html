@@ -7,7 +7,8 @@
                     <button class="btn btn-success float-end" routerLink="/crear-producto">
                         nuevo
                     </button>
-                    <table class="table table-striped mt-4">
+                    <table *ngIf="listaProductos.length > 0"
+                    class="table table-striped mt-4">
                         <thead>
                           <tr>
                             <th scope="col">Producto</th>
@@ -18,39 +19,20 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th>Mass Effect 3</th>
-                            <td>Juego digital</td>
-                            <td>Chile</td>
-                            <td>10000</td>
+                          <tr *ngFor="let producto of listaProductos">
+                            <th>{{producto.nombre}}</th>
+                            <td>{{producto.categoria}}</td>
+                            <td>{{producto.ubicacion}}</td>
+                            <td>{{producto.precio | currency: 'USD'}}</td>
                             <td>
-                                <i class="fas fa-edit text-success"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
+                                <i class="fas fa-edit text-success" [routerLink]="['/editar-producto', producto._id]"></i>
+                                <i class="fas fa-trash-alt text-danger" (click)="eliminarProducto(producto._id)"></i>
                             </td>
                           </tr>
-                          <tr>
-                            <th>Skyrim</th>
-                            <td>Juego digital</td>
-                            <td>Chile</td>
-                            <td>6000</td>
-                            <td>
-                                <i class="fas fa-edit text-success"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </td>
-                          </tr>
-                          <tr>
-                            <th>Assassin's creed</th>
-                            <td>Juego digital</td>
-                            <td>Chile</td>
-                            <td>15000</td>
-                            <td>
-                                <i class="fas fa-edit text-success"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                                
-                            </td>
-                          </tr>
+                         
                         </tbody>
                       </table>
+                      <h5 class="tablaVacia" *ngIf="listaProductos.length == 0">No hay productos registrados</h5>
                 </div>
             </div>
         </div>

@@ -2,3 +2,8 @@
     cursor: pointer;
     margin-left: 7px;
 }
+
+.tablaVacia{
+    text-align: start;
+    margin-top: 10px;
+}

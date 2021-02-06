@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { Producto } from 'src/app/models/producto.model';
+import { ProductoService } from 'src/app/services/producto.service';
 
 @Component({
   selector: 'app-crear-producto',
@@ -13,11 +14,15 @@ import { Producto } from 'src/app/models/producto.model';
 export class CrearProductoComponent implements OnInit {
 
   productoForm: FormGroup;
+  titulo: string = "Crear Producto";
+  id:string | null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private productoService:ProductoService,
+    private aRouter: ActivatedRoute
     ) { 
     this.productoForm = this.fb.group({
       producto: ['', Validators.required],
@@ -25,9 +30,11 @@ export class CrearProductoComponent implements OnInit {
       ubicacion: ['', Validators.required],
       precio: ['', Validators.required]
     });
+    this.id = this.aRouter.snapshot.paramMap.get('id');
   }
 
   ngOnInit(): void {
+    this.esEditar();
   }
 
   agregarProducto(){
@@ -39,11 +46,47 @@ export class CrearProductoComponent implements OnInit {
       precio: this.productoForm.get('precio')?.value
     }
 
-    this.toastr.success('Datos de producto guardados correctamente.', 'Producto Guardado!');
+    if(this.id !== null){
+      //el producto no es nuevo
+      this.productoService.editarProducto(this.id, producto).subscribe(data => {
+        this.toastr.info('Datos de producto editados correctamente.', 'Producto Editado!');
+        this.router.navigate(['/']);
+      },error =>{
+        console.log(error);
+        this.productoForm.reset();
+      });
 
-    this.router.navigate(['/']);
+    }else{
+      // el producto no esta registrado aun
+      this.productoService.guardarProducto(producto).subscribe(data => {
+        this.toastr.success('Datos de producto guardados correctamente.', 'Producto Guardado!');
+        this.router.navigate(['/']);
+      },error =>{
+        console.log(error);
+        this.productoForm.reset();
+      });
+    }
 
+    
+    
 
   }
+
+
+  esEditar(){
+    if (this.id!==null) {
+      this.titulo = "Editar Producto";
+      this.productoService.obtenerProducto(this.id).subscribe(data =>{
+        this.productoForm.setValue({
+          producto: data.nombre, 
+          categoria: data.categoria, 
+          ubicacion: data.ubicacion, 
+          precio: data.precio
+        });
+      });
+    }
+  }
+
+
 
 }
